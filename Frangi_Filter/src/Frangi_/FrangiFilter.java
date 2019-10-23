@@ -1,5 +1,3 @@
-package Frangi_;
-
 /* 
  * Copyright or © or Copr. Arnold Fertin 2019
  *
@@ -25,6 +23,8 @@ package Frangi_;
  * The fact that you are presently reading this means that you have had knowledge of the CeCILL-C license and that you
  * accept its terms.
  */
+package Frangi_;
+
 import ij.ImagePlus;
 import ij.ImageStack;
 import imagescience.feature.Hessian;
@@ -124,13 +124,13 @@ public final class FrangiFilter
 
     public static ImagePlus exec(final ImagePlus imp,
                                  final double sigma0,
-                                 final double sigmaM,
-                                 final int qLevel,
+                                 final int noct,
+                                 final int qlvl,
                                  final double k,
                                  final double beta,
                                  final boolean smax)
     {
-        final double[] scales = createScaleRange(sigma0, sigmaM, qLevel);
+        final double[] scales = createScaleRange(sigma0, noct, qlvl);
         final Image img = Image.wrap(imp);
         final Dimensions dims = new Dimensions(img.dimensions().x, img.dimensions().y, scales.length);
         final FloatImage vessMulti = new FloatImage(dims);
@@ -166,15 +166,28 @@ public final class FrangiFilter
         return 0.5d + width / (2d * Math.sqrt(3d));
     }
 
+//    private static double[] createScaleRange(final double s0,
+//                                             final double sm,
+//                                             final int q)
+//    {
+//        final int m = ((int) Math.floor(((double) q) * Math.log(sm / s0) / Math.log(2d))) + 1;
+//        final double[] scales = new double[m];
+//        for (int i = 0; i < m; i++)
+//        {
+//            scales[i] = s0 * Math.pow(2, ((double) i) / q);
+//        }
+//        return scales;
+//    }
     private static double[] createScaleRange(final double s0,
-                                             final double sm,
-                                             final int q)
+                                             final int noct,
+                                             final int qlvl)
     {
-        final int m = ((int) Math.floor(((double) q) * Math.log(sm / s0) / Math.log(2d))) + 1;
+        final int m = noct * qlvl + 1; //((int) Math.floor(((double) q) * Math.log(sm / s0) / Math.log(2d))) + 1;
         final double[] scales = new double[m];
         for (int i = 0; i < m; i++)
         {
-            scales[i] = s0 * Math.pow(2, ((double) i) / q);
+            scales[i] = s0 * Math.pow(2, ((double) i) / qlvl);
+//            System.out.println("" + scales[i]);
         }
         return scales;
     }

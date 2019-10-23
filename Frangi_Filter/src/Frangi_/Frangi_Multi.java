@@ -38,9 +38,9 @@ import ij.process.ImageProcessor;
  */
 public class Frangi_Multi implements PlugInFilter
 {
-    private double sigma0, sigmaM;
+    private double sigma0;
 
-    private int qLevel;
+    private int nOctave, qLevel;
 
     private ImagePlus imp;
 
@@ -57,7 +57,7 @@ public class Frangi_Multi implements PlugInFilter
         {
             return;
         }
-        final ImagePlus imgv = FrangiFilter.exec(imp, sigma0, sigmaM, qLevel, k, beta, smax);
+        final ImagePlus imgv = FrangiFilter.exec(imp, sigma0, nOctave, qLevel, k, beta, smax);
         imgv.setTitle("Frangi Filter");
         imgv.show();
     }
@@ -66,8 +66,8 @@ public class Frangi_Multi implements PlugInFilter
     {
         final GenericDialog gd = new GenericDialog("Frangi filter...", IJ.getInstance());
         gd.addNumericField("Sigma_0", 1.0, 2);
-        gd.addNumericField("Sigma_max", 1.0, 2);
-        gd.addNumericField("Q_level", 1, 1);
+        gd.addNumericField("Number_of_octave", 1, 1);
+        gd.addNumericField("Number_of_level_per_octave", 1, 1);
         gd.addNumericField("K", K, 2);
         gd.addNumericField("Beta", BETA, 2);
         gd.addCheckbox("S_max", true);
@@ -77,7 +77,7 @@ public class Frangi_Multi implements PlugInFilter
             return false;
         }
         sigma0 = (double) gd.getNextNumber();
-        sigmaM = (double) gd.getNextNumber();
+        nOctave = (int) gd.getNextNumber();
         qLevel = (int) gd.getNextNumber();
         k = (double) gd.getNextNumber();
         beta = (double) gd.getNextNumber();
