@@ -1,5 +1,3 @@
-package Frangi_;
-
 /* 
  * Copyright or © or Copr. Arnold Fertin 2019
  *
@@ -25,6 +23,8 @@ package Frangi_;
  * The fact that you are presently reading this means that you have had knowledge of the CeCILL-C license and that you
  * accept its terms.
  */
+package Frangi_;
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
