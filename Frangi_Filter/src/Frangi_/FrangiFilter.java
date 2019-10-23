@@ -32,8 +32,6 @@ import imagescience.image.Coordinates;
 import imagescience.image.Dimensions;
 import imagescience.image.FloatImage;
 import imagescience.image.Image;
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 
 /**
  *
@@ -47,9 +45,8 @@ public final class FrangiFilter
 
     private static FloatImage filter(final Image img,
                                      final double sigma,
-                                     final double k,
                                      final double beta,
-                                     final boolean smax)
+                                     final double gamma)
     {
         final Hessian hess = new Hessian();
         Image[] eigens = new Image[2];
@@ -68,20 +65,21 @@ public final class FrangiFilter
                 S[i] = Math.sqrt(l1 * l1 + l2 * l2);
             }
         }
-        final double Smax;
-        if (smax)
-        {
-            Smax = new Max().evaluate(S);
-        }
-        else
-        {
-            final Percentile perc = new Percentile();
-            perc.setData(S);
-            final double q1 = perc.evaluate(25);
-            final double q3 = perc.evaluate(75);
-            Smax = q3 + 1.5d * (q3 - q1);
-        }
-        final double c = k * Smax;
+//        final double Smax;
+//        if (smax)
+//        {
+//            Smax = new Max().evaluate(S);
+//        }
+//        else
+//        {
+//            final Percentile perc = new Percentile();
+//            perc.setData(S);
+//            final double q1 = perc.evaluate(25);
+//            final double q3 = perc.evaluate(75);
+//            Smax = q3 + 1.5d * (q3 - q1);
+//        }
+        final double gammaSq = 2 * gamma * gamma;
+        final double betaSq = 2 * beta * beta;
         final FloatImage vesselness = new FloatImage(dims);
         for (coords.y = 0, i = 0; coords.y < dims.y; ++coords.y)
         {
@@ -102,8 +100,7 @@ public final class FrangiFilter
                 else
                 {
                     final double Rb = l1 / l2;
-                    final double v = Math.exp(-Rb * Rb / (2 * beta * beta)) * (1 - Math.
-                            exp(-S[i] * S[i] / (2 * c * c)));
+                    final double v = Math.exp(-Rb * Rb / betaSq) * (1 - Math.exp(-S[i] * S[i] / gammaSq));
                     vesselness.set(coords, v);
                 }
             }
@@ -114,21 +111,19 @@ public final class FrangiFilter
 
     public static ImagePlus exec(final ImagePlus imp,
                                  final double sigma,
-                                 final double k,
                                  final double beta,
-                                 final boolean smax)
+                                 final double gamma)
     {
         final Image img = Image.wrap(imp);
-        return filter(img, sigma, k, beta, smax).imageplus();
+        return filter(img, sigma, beta, gamma).imageplus();
     }
 
     public static ImagePlus exec(final ImagePlus imp,
                                  final double sigma0,
                                  final int noct,
                                  final int qlvl,
-                                 final double k,
                                  final double beta,
-                                 final boolean smax)
+                                 final double gamma)
     {
         final double[] scales = createScaleRange(sigma0, noct, qlvl);
         final Image img = Image.wrap(imp);
@@ -136,7 +131,7 @@ public final class FrangiFilter
         final FloatImage vessMulti = new FloatImage(dims);
         for (int i = 0; i < scales.length; i++)
         {
-            final FloatImage vesselness = filter(img, scales[i], k, beta, smax);
+            final FloatImage vesselness = filter(img, scales[i], beta, gamma);
             final Coordinates coords1 = new Coordinates(0, 0);
             final Coordinates coords2 = new Coordinates(0, 0, i);
             for (coords1.y = 0; coords1.y < dims.y; ++coords1.y)

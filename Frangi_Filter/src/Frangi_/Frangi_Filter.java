@@ -41,18 +41,16 @@ public class Frangi_Filter implements PlugInFilter
 
     private ImagePlus imp;
 
-    private double k, beta;
+    private double beta, gamma;
 
-    private boolean smax;
-
-    static final double K = 0.5, BETA = 0.5;
+    static final double BETA = 0.5, GAMMA = 15;
 
     public boolean doDialog()
     {
         final GenericDialog gd = new GenericDialog("Frangi filter...", IJ.getInstance());
         gd.addNumericField("Scale", 1.0, 2);
-        gd.addNumericField("K", K, 2);
         gd.addNumericField("Beta", BETA, 2);
+        gd.addNumericField("Gamma", GAMMA, 2);
         gd.addCheckbox("S_max", true);
         gd.showDialog();
         if (gd.wasCanceled())
@@ -60,9 +58,8 @@ public class Frangi_Filter implements PlugInFilter
             return false;
         }
         sigma = (double) gd.getNextNumber();
-        k = (double) gd.getNextNumber();
         beta = (double) gd.getNextNumber();
-        smax = gd.getNextBoolean();
+        gamma = (double) gd.getNextNumber();
         return true;
     }
 
@@ -74,7 +71,7 @@ public class Frangi_Filter implements PlugInFilter
             return;
         }
 
-        final ImagePlus imgv = FrangiFilter.exec(imp, sigma, k, beta, smax);
+        final ImagePlus imgv = FrangiFilter.exec(imp, sigma, beta, gamma);
         imgv.setTitle("Frangi Filter");
         imgv.show();
     }

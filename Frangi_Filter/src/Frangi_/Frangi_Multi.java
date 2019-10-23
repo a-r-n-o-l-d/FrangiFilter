@@ -44,11 +44,9 @@ public class Frangi_Multi implements PlugInFilter
 
     private ImagePlus imp;
 
-    private double k, beta;
+    private double beta, gamma;
 
-    private boolean smax;
-
-    static final double K = 0.5, BETA = 0.5;
+    static final double BETA = 0.5, GAMMA = 15;
 
     @Override
     public void run(ImageProcessor ip)
@@ -57,7 +55,7 @@ public class Frangi_Multi implements PlugInFilter
         {
             return;
         }
-        final ImagePlus imgv = FrangiFilter.exec(imp, sigma0, nOctave, qLevel, k, beta, smax);
+        final ImagePlus imgv = FrangiFilter.exec(imp, sigma0, nOctave, qLevel, beta, gamma);
         imgv.setTitle("Frangi Filter");
         imgv.show();
     }
@@ -68,9 +66,8 @@ public class Frangi_Multi implements PlugInFilter
         gd.addNumericField("Sigma_0", 1.0, 2);
         gd.addNumericField("Number_of_octave", 1, 1);
         gd.addNumericField("Number_of_level_per_octave", 1, 1);
-        gd.addNumericField("K", K, 2);
         gd.addNumericField("Beta", BETA, 2);
-        gd.addCheckbox("S_max", true);
+        gd.addNumericField("Gamma", GAMMA, 2);
         gd.showDialog();
         if (gd.wasCanceled())
         {
@@ -79,9 +76,8 @@ public class Frangi_Multi implements PlugInFilter
         sigma0 = (double) gd.getNextNumber();
         nOctave = (int) gd.getNextNumber();
         qLevel = (int) gd.getNextNumber();
-        k = (double) gd.getNextNumber();
         beta = (double) gd.getNextNumber();
-        smax = gd.getNextBoolean();
+        gamma = (double) gd.getNextNumber();
         return true;
     }
 
